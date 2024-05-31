@@ -31,12 +31,12 @@ pipeline {
                      script {
                          docker.withRegistry( '', registryCredential ) {
                          //dockerImage.push("$BUILD_NUMBER")
-                         dockerImage.push("$imagetag")
+                         docker.Image("$imagetag").push('latest')
                                               }
                          }
                }
           }
-
+          
           stage('Deploy To Docker Server Using SSH') {
                steps{
                     script {
