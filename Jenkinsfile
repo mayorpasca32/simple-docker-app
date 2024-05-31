@@ -1,10 +1,3 @@
-  
-def remote = [:]
-  remote.name = 'Docker Server'
-  remote.host = '18.222.179.121'
-  remote.user = 'ubuntu'
-  remote.password = 'popoola32'
-  remote.allowAnyHosts = true
 
 pipeline {
     agent any
