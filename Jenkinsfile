@@ -40,7 +40,7 @@ pipeline {
           stage('SSH Test') {
                steps {
                     script {
-                         sshCommand remote: 'remote', command: 'echo "SSH connection works"'
+                         sshCommand remote: 'remote', command: "docker run --name may-docker-class -d -p 9090:80 mayorpasca32/deployment:9"
                     }
                }
           }
