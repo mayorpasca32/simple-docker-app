@@ -1,59 +1,46 @@
-  
-def remote = [:]
-  remote.name = 'Docker Server'
-  remote.host = '18.222.179.121'
-  remote.user = 'ubuntu'
-  remote.password = 'popoola32'
-  remote.allowAnyHosts = true
-
 pipeline {
-  agent any
+    agent any
 
-  environment {
-       imagename = "mayorpasca32/deployment"
-       registryCredential = 'DOCKERLOGIN'
-       dockerImage = ''
-       imagetag    = "${env.BUILD_ID}"
-           }
+    environment {
+        // Define environment variables for Docker Hub credentials
+        DOCKER_HUB_USERNAME = credentials('mayorpasca32')
+        DOCKER_HUB_PASSWORD = credentials('Popoola32.')
+        DOCKER_IMAGE_NAME = 'mayorpasca32/deployment'
+        DOCKER_IMAGE_TAG = 'latest'
+    }
 
-     stages {
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                // Checkout source code from repository
+                checkout scm
 
-          stage('Building Docker image') {
-               steps{
-                   script {
-                       dockerImage = docker.build imagename
-                          }
-               }
-          }
+                // Build Docker image
+                script {
+                    dockerImage = docker.build("${mayorpasca32/deployment}:${latest}", "-f Dockerfile .")
+                }
+            }
+        }
 
-          stage('Push Image To DockerHub') {
-               steps{
-                     script {
-                         docker.withRegistry( '', registryCredential ) {
-                         //dockerImage.push("$BUILD_NUMBER")
-                         dockerImage.push("$imagetag")
-                                              }
-                         }
-               }
-          }
-          
-
-          stage('Deploy To Docker Server Using SSH') {
-               steps{
-                    script {
-                         sshCommand remote: remote, command: "docker run --name may-docker-class -d -p 9090:80 mayorpasca32/deployment"
-
+        stage('Push to Docker Hub') {
+            steps {
+                // Log in to Docker Hub
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', "${mayorpasca32}", "${Popoola32.}") {
+                        // Push Docker image to Docker Hub
+                        dockerImage.push("${latest}")
                     }
-               }
-          }
+                }
+            }
+        }
+    }
 
-          stage('Remove Unused docker image') {
-               steps{
-                    //sh "docker rmi $imagename:$BUILD_NUMBER"
-                    //sh "docker rmi $imagename:$imagetag"
-                    sh "docker system prune -f"
-                    }
-          }
-    
-     }
+    post {
+        success {
+            echo 'Docker image built and pushed successfully!'
+        }
+        failure {
+            echo 'Failed to build or push Docker image.'
+        }
+    }
 }
