@@ -37,6 +37,14 @@ pipeline {
                }
           }
           
+          stage('SSH Test') {
+               steps {
+                    script {
+                         sshCommand remote: 'remote', command: 'echo "SSH connection works"'
+                    }
+               }
+          }
+
           stage('Deploy To Docker Server Using SSH') {
                steps{
                     script {
