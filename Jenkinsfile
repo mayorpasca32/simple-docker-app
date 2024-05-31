@@ -31,7 +31,7 @@ pipeline {
                      script {
                          docker.withRegistry( '', registryCredential ) {
                          //dockerImage.push("$BUILD_NUMBER")
-                         docker.Image("$imagetag").push('latest')
+                         dockerImage.push("$imagetag")
                                               }
                          }
                }
